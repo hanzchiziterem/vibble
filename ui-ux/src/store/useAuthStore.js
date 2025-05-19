@@ -1,25 +1,25 @@
 import { create } from "zustand";
-import { axiosInstance } from "../lib/axios";
-
-/* Global State Manager, 
-    Creating this in one place so we can use it everywhere.
-*/
+import { axiosInstance } from "../lib/axios.js";
+import toast from "react-hot-toast";
 
 export const useAuthStore = create((set) => ({
   authUser: null,
   isSigningUp: false,
   isLoggingIn: false,
   isUpdatingProfile: false,
+
   isCheckingAuth: true,
-  checkAuth: () => {
+
+  updateProfile: async (data) => {
+    set({ isUpdatingProfile: true });
     try {
-        const res = axiosInstance.get("/auth/check");
-        set({authUser: res.data})
+      const res = axiosInstance.put("/auth/update-profile", data);
+      set({ authUser: res.data });
+      toast.success("Profile updated succesfully.");
     } catch (error) {
-        console.log("Error in checkAuth: ", error);
-         set({authUser: null})
+      toast.error(error.response.data.message);  
     } finally {
-         set({authUser: false})
+      set({ isUpdatingProfile: false });
     }
-  }
+  },
 }));
